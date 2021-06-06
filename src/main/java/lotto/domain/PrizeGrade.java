@@ -1,6 +1,7 @@
 package lotto.domain;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 public enum PrizeGrade {
   FIRST_CLASS(6, false, 2_000_000_000),
@@ -15,9 +16,10 @@ public enum PrizeGrade {
   private final long prizeMoney;
 
   public static PrizeGrade of(int matchCount, boolean isHaveBonusNumber) {
+    Predicate<PrizeGrade> prizeGradePredicate = prizeGrade -> prizeGrade.getMatchCount() == matchCount;
+    Predicate<PrizeGrade> SecondClassPredicate = prizeGrade -> prizeGrade.bonusMatch == isHaveBonusNumber && matchCount == 5;
     return Arrays.stream(PrizeGrade.values())
-        .filter(prizeGrade -> prizeGrade.getMatchCount() == matchCount)
-        .filter(prizeGrade -> prizeGrade.bonusMatch == isHaveBonusNumber)
+        .filter(prizeGradePredicate.or(SecondClassPredicate))
         .findFirst()
         .orElse(FAIL);
   }
